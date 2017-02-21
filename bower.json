@@ -1,0 +1,8 @@
+{
+  "name": "cloudbridge-core-js",
+  "license": "MIT",
+  "main": "./cloudbridge-core.js",
+  "ignore": [],
+  "dependencies": {},
+  "version": "0.0.1"
+}
