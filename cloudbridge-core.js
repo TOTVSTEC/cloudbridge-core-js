@@ -436,7 +436,6 @@ var TOTVS;
                 socket.onopen = function () {
                     _this.qwebchannel = new QWebChannel(socket, function (channel) {
                         _this.dialog = channel.objects.mainDialog;
-                        // Carrega mensageria global [CSS, JavaScript]
                         _this.dialog.advplToJs.connect(function (codeType, codeContent, objectName) {
                             if (codeType == "js") {
                                 var scriptRef = document.createElement('script');
@@ -452,7 +451,6 @@ var TOTVS;
                                 document.getElementsByTagName("head")[0].appendChild(linkRef);
                             }
                         });
-                        // Executa callback
                         if (typeof callback === 'function')
                             callback();
                     });
@@ -460,7 +458,6 @@ var TOTVS;
             }
         }
         TWebChannel.prototype.runAdvpl = function (command, onSuccess) {
-            // Formata JSON com o Bloco de Código e o callBack
             var jsonCommand = {
                 'codeBlock': command,
                 'callBack': onSuccess.name
@@ -503,6 +500,49 @@ var TOTVS;
         TWebChannel.prototype.openSettings = function (feature, onSuccess) {
             this.dialog.jsToAdvpl("openSettings", feature);
         };
+        TWebChannel.prototype.getTempPath = function (onSuccess) {
+            this.dialog.jsToAdvpl("getTempPath", onSuccess.name);
+        };
+        TWebChannel.prototype.vibrate = function (milliseconds) {
+            this.dialog.jsToAdvpl("vibrate", milliseconds);
+        };
+        TWebChannel.prototype.dbGet = function (query, onSuccess, onError) {
+            var jsonCommand = {
+                'query': query,
+                'callBackSuccess': onSuccess.name,
+                'callBackError': onError.name
+            };
+            this.dialog.jsToAdvpl("dbGet", JSON.stringify(jsonCommand));
+        };
+        TWebChannel.prototype.dbExec = function (query, onSuccess, onError) {
+            var jsonCommand = {
+                'query': query,
+                'callBackSuccess': onSuccess.name,
+                'callBackError': onError.name
+            };
+            this.dialog.jsToAdvpl("dbExec", JSON.stringify(jsonCommand));
+        };
+        TWebChannel.prototype.dbBegin = function (onSuccess, onError) {
+            var jsonCommand = {
+                'callBackSuccess': onSuccess.name,
+                'callBackError': onError.name
+            };
+            this.dialog.jsToAdvpl("dbBegin", JSON.stringify(jsonCommand));
+        };
+        TWebChannel.prototype.dbCommit = function (onSuccess, onError) {
+            var jsonCommand = {
+                'callBackSuccess': onSuccess.name,
+                'callBackError': onError.name
+            };
+            this.dialog.jsToAdvpl("dbCommit", JSON.stringify(jsonCommand));
+        };
+        TWebChannel.prototype.dbRollback = function (onSuccess, onError) {
+            var jsonCommand = {
+                'callBackSuccess': onSuccess.name,
+                'callBackError': onError.name
+            };
+            this.dialog.jsToAdvpl("dbRollback", JSON.stringify(jsonCommand));
+        };
         TWebChannel.prototype.jsToAdvpl = function (codeType, codeContent) {
             this.dialog.jsToAdvpl(codeType, codeContent);
         };
@@ -514,7 +554,7 @@ var TOTVS;
         TWebChannel.CONNECTED_WIFI = 5;
         TWebChannel.CONNECTED_MOBILE = 6;
         return TWebChannel;
-    })();
+    }());
     TOTVS.TWebChannel = TWebChannel;
 })(TOTVS || (TOTVS = {}));
 //# sourceMappingURL=totvs-twebchannel.js.map
