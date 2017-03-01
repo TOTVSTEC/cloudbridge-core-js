@@ -422,14 +422,26 @@ var TOTVS;
 (function (TOTVS) {
     var TWebChannel = (function () {
         function TWebChannel(port, callback) {
+            this.internalWSPort = -1;
             if (window['Promise'] !== undefined) {
                 this.__send = this.__send_promise;
             }
             else {
                 this.__send = this.__send_callback;
             }
-            this.internalWSPort = port;
-            if (this.internalWSPort) {
+            if ((callback === undefined) && (typeof port === 'function')) {
+                callback = port;
+                port = undefined;
+            }
+            if (port !== undefined) {
+                if (typeof port !== 'number')
+                    throw new TypeError('Parameter "port" must be numeric.');
+                this.internalWSPort = port;
+            }
+            if (this.internalWSPort === -1) {
+                throw new Error('Parameter "port" must be numeric.');
+            }
+            if (this.internalWSPort > -1) {
                 var _this = this;
                 var baseUrl = "ws://127.0.0.1:" + this.internalWSPort;
                 var socket = new WebSocket(baseUrl);
@@ -463,6 +475,28 @@ var TOTVS;
                 };
             }
         }
+        TWebChannel.getChannel = function () {
+        };
+        TWebChannel.start = function (port) {
+            if (TWebChannel.instance === null) {
+                var channel = new TWebChannel(port, function () {
+                    TWebChannel.instance = channel;
+                    TWebChannel.emit('cloudbridgeready');
+                });
+            }
+            else {
+                TWebChannel.emit('cloudbridgeready');
+            }
+        };
+        TWebChannel.emit = function (name) {
+            var event = new CustomEvent(name, {
+                'detail': {
+                    'channel': TWebChannel.instance
+                }
+            });
+            event["channel"] = TWebChannel.instance;
+            document.dispatchEvent(event);
+        };
         TWebChannel.prototype.runAdvpl = function (command, callback) {
             return this.__send("runAdvpl", command, callback);
         };
@@ -584,7 +618,8 @@ var TOTVS;
             }
             return data;
         };
-        TWebChannel.version = "0.0.10";
+        TWebChannel.instance = null;
+        TWebChannel.version = "0.0.11";
         TWebChannel.BLUETOOTH_FEATURE = 1;
         TWebChannel.NFC_FEATURE = 2;
         TWebChannel.WIFI_FEATURE = 3;
