@@ -165,10 +165,12 @@ var QWebChannel = function(transport, initCallback)
         for (var objectName in channel.objects) {
             channel.objects[objectName].unwrapProperties();
         }
+
+        channel.exec({type: QWebChannelMessageTypes.idle});
+
         if (initCallback) {
             initCallback(channel);
         }
-        channel.exec({type: QWebChannelMessageTypes.idle});
     });
 };
 
@@ -647,19 +649,19 @@ var TOTVS;
                     try {
                         _this.dialog.jsToAdvpl(id, _this.__JSON_stringify(content), function (data) {
                             resolve(_this.__JSON_parse(data));
+                            if ((onSuccess) && (typeof onSuccess === 'function')) {
+                                onSuccess(data);
+                            }
                         });
                     }
                     catch (error) {
                         reject(error);
+                        if ((onError) && (typeof onError === 'function')) {
+                            onError(error);
+                        }
                     }
                 });
             });
-            if ((onSuccess) && (typeof onSuccess === 'function')) {
-                promise.then(onSuccess);
-            }
-            if ((onError) && (typeof onError === 'function')) {
-                promise.catch(onError);
-            }
             return promise;
         };
         TWebChannel.prototype.__send_callback = function (id, content, onSuccess, onError) {
@@ -712,7 +714,7 @@ var TOTVS;
         return TWebChannel;
     }());
     TWebChannel.instance = null;
-    TWebChannel.version = "0.0.16";
+    TWebChannel.version = "0.0.17";
     TWebChannel.BLUETOOTH_FEATURE = 1;
     TWebChannel.NFC_FEATURE = 2;
     TWebChannel.WIFI_FEATURE = 3;
