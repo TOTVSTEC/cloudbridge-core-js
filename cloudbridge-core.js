@@ -420,9 +420,87 @@ if (typeof module === 'object') {
 
 var TOTVS;
 (function (TOTVS) {
+    var PromiseQueue = (function () {
+        function PromiseQueue(maxPendingPromises, maxQueuedPromises) {
+            this.pendingPromises = 0;
+            this.maxPendingPromises = typeof maxPendingPromises !== 'undefined' ? maxPendingPromises : 1;
+            this.maxQueuedPromises = typeof maxQueuedPromises !== 'undefined' ? maxQueuedPromises : Infinity;
+            this.queue = [];
+        }
+        PromiseQueue.prototype.add = function (promiseGenerator) {
+            var self = this;
+            return new Promise(function (resolve, reject, notify) {
+                if (self.queue.length >= self.maxQueuedPromises) {
+                    reject(new Error('Queue limit reached'));
+                    return;
+                }
+                self.queue.push({
+                    promiseGenerator: promiseGenerator,
+                    resolve: resolve,
+                    reject: reject,
+                    notify: notify || self.noop
+                });
+                self._dequeue();
+            });
+        };
+        PromiseQueue.prototype.noop = function () {
+        };
+        PromiseQueue.prototype.getPendingLength = function () {
+            return this.pendingPromises;
+        };
+        PromiseQueue.prototype.getQueueLength = function () {
+            return this.queue.length;
+        };
+        PromiseQueue.prototype._dequeue = function () {
+            var self = this;
+            if (this.pendingPromises >= this.maxPendingPromises) {
+                return false;
+            }
+            var item = this.queue.shift();
+            if (!item) {
+                return false;
+            }
+            try {
+                this.pendingPromises++;
+                this.resolveWith(item.promiseGenerator())
+                    .then(function (value) {
+                    self.pendingPromises--;
+                    item.resolve(value);
+                    self._dequeue();
+                }, function (err) {
+                    self.pendingPromises--;
+                    item.reject(err);
+                    self._dequeue();
+                }, function (message) {
+                    item.notify(message);
+                });
+            }
+            catch (err) {
+                self.pendingPromises--;
+                item.reject(err);
+                self._dequeue();
+            }
+            return true;
+        };
+        PromiseQueue.prototype.resolveWith = function (value) {
+            if (value && typeof value.then === 'function') {
+                return value;
+            }
+            return new Promise(function (resolve) {
+                resolve(value);
+            });
+        };
+        return PromiseQueue;
+    }());
+    TOTVS.PromiseQueue = PromiseQueue;
+})(TOTVS || (TOTVS = {}));
+//# sourceMappingURL=promisequeue.js.map
+var TOTVS;
+(function (TOTVS) {
     var TWebChannel = (function () {
         function TWebChannel(port, callback) {
             this.internalWSPort = -1;
+            this.queue = new TOTVS.PromiseQueue();
             if (window['Promise'] !== undefined) {
                 this.__send = this.__send_promise;
             }
@@ -556,15 +634,17 @@ var TOTVS;
         };
         TWebChannel.prototype.__send_promise = function (id, content, onSuccess, onError) {
             var _this = this;
-            var promise = new Promise(function (resolve, reject) {
-                try {
-                    _this.dialog.jsToAdvpl(id, _this.__JSON_stringify(content), function (data) {
-                        resolve(_this.__JSON_parse(data));
-                    });
-                }
-                catch (error) {
-                    reject(error);
-                }
+            var promise = this.queue.add(function () {
+                return new Promise(function (resolve, reject) {
+                    try {
+                        _this.dialog.jsToAdvpl(id, _this.__JSON_stringify(content), function (data) {
+                            resolve(_this.__JSON_parse(data));
+                        });
+                    }
+                    catch (error) {
+                        reject(error);
+                    }
+                });
             });
             if ((onSuccess) && (typeof onSuccess === 'function')) {
                 promise.then(onSuccess);
@@ -604,7 +684,7 @@ var TOTVS;
                     return TWebChannel.JSON_FLAG + JSON.stringify(data) + TWebChannel.JSON_FLAG;
                 }
             }
-            return data.toString();
+            return JSON.stringify(data);
         };
         TWebChannel.prototype.__JSON_parse = function (data) {
             if (typeof data === 'string') {
@@ -619,7 +699,7 @@ var TOTVS;
             return data;
         };
         TWebChannel.instance = null;
-        TWebChannel.version = "0.0.11";
+        TWebChannel.version = "0.0.12";
         TWebChannel.BLUETOOTH_FEATURE = 1;
         TWebChannel.NFC_FEATURE = 2;
         TWebChannel.WIFI_FEATURE = 3;
