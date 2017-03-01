@@ -445,6 +445,13 @@ var TOTVS;
         };
         PromiseQueue.prototype.noop = function () {
         };
+        PromiseQueue.prototype.setMaxPendingPromises = function (length) {
+            var diff = (length - this.maxPendingPromises);
+            this.maxPendingPromises = length;
+            for (; diff > 0; diff--) {
+                this._dequeue();
+            }
+        };
         PromiseQueue.prototype.getPendingLength = function () {
             return this.pendingPromises;
         };
@@ -500,7 +507,7 @@ var TOTVS;
     var TWebChannel = (function () {
         function TWebChannel(port, callback) {
             this.internalWSPort = -1;
-            this.queue = new TOTVS.PromiseQueue();
+            this.queue = new TOTVS.PromiseQueue(0);
             if (window['Promise'] !== undefined) {
                 this.__send = this.__send_promise;
             }
@@ -549,6 +556,7 @@ var TOTVS;
                         });
                         if (typeof callback === 'function')
                             callback();
+                        _this.queue.setMaxPendingPromises(1);
                     });
                 };
             }
@@ -701,17 +709,17 @@ var TOTVS;
             }
             return data;
         };
-        TWebChannel.instance = null;
-        TWebChannel.version = "0.0.13";
-        TWebChannel.BLUETOOTH_FEATURE = 1;
-        TWebChannel.NFC_FEATURE = 2;
-        TWebChannel.WIFI_FEATURE = 3;
-        TWebChannel.LOCATION_FEATURE = 4;
-        TWebChannel.CONNECTED_WIFI = 5;
-        TWebChannel.CONNECTED_MOBILE = 6;
-        TWebChannel.JSON_FLAG = "#JSON#";
         return TWebChannel;
     }());
+    TWebChannel.instance = null;
+    TWebChannel.version = "0.0.14";
+    TWebChannel.BLUETOOTH_FEATURE = 1;
+    TWebChannel.NFC_FEATURE = 2;
+    TWebChannel.WIFI_FEATURE = 3;
+    TWebChannel.LOCATION_FEATURE = 4;
+    TWebChannel.CONNECTED_WIFI = 5;
+    TWebChannel.CONNECTED_MOBILE = 6;
+    TWebChannel.JSON_FLAG = "#JSON#";
     TOTVS.TWebChannel = TWebChannel;
 })(TOTVS || (TOTVS = {}));
 //# sourceMappingURL=totvs-twebchannel.js.map
