@@ -4,5 +4,5 @@
   "main": "./cloudbridge-core.js",
   "ignore": [],
   "dependencies": {},
-  "version": "v0.0.17"
+  "version": "v0.0.18"
 }

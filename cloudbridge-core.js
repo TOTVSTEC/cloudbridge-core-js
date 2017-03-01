@@ -166,11 +166,13 @@ var QWebChannel = function(transport, initCallback)
             channel.objects[objectName].unwrapProperties();
         }
 
+        // TOTVS - verificar as linhas abaixo antes de alterar o arquivo
         channel.exec({type: QWebChannelMessageTypes.idle});
 
         if (initCallback) {
-            initCallback(channel);
+            setTimeout(initCallback.bind(null, channel),0);
         }
+        //END TOTVS
     });
 };
 
@@ -714,7 +716,7 @@ var TOTVS;
         return TWebChannel;
     }());
     TWebChannel.instance = null;
-    TWebChannel.version = "0.0.17";
+    TWebChannel.version = "0.0.18";
     TWebChannel.BLUETOOTH_FEATURE = 1;
     TWebChannel.NFC_FEATURE = 2;
     TWebChannel.WIFI_FEATURE = 3;
