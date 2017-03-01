@@ -517,3 +517,4 @@ var TOTVS;
     })();
     TOTVS.TWebChannel = TWebChannel;
 })(TOTVS || (TOTVS = {}));
+//# sourceMappingURL=totvs-twebchannel.js.map
