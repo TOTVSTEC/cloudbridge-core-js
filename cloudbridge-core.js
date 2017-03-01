@@ -584,7 +584,7 @@ var TOTVS;
             }
             return data;
         };
-        TWebChannel.version = "0.0.8";
+        TWebChannel.version = "0.0.9";
         TWebChannel.BLUETOOTH_FEATURE = 1;
         TWebChannel.NFC_FEATURE = 2;
         TWebChannel.WIFI_FEATURE = 3;
