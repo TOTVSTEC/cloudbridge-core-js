@@ -679,6 +679,9 @@ var TOTVS;
             if (data === null) {
                 return null;
             }
+            else if (typeof data === "string") {
+                return data;
+            }
             else {
                 if ((Array.isArray(data)) || (typeof data === "object")) {
                     return TWebChannel.JSON_FLAG + JSON.stringify(data) + TWebChannel.JSON_FLAG;
@@ -699,7 +702,7 @@ var TOTVS;
             return data;
         };
         TWebChannel.instance = null;
-        TWebChannel.version = "0.0.12";
+        TWebChannel.version = "0.0.13";
         TWebChannel.BLUETOOTH_FEATURE = 1;
         TWebChannel.NFC_FEATURE = 2;
         TWebChannel.WIFI_FEATURE = 3;
