@@ -543,10 +543,13 @@ var TOTVS;
             };
             this.dialog.jsToAdvpl("dbRollback", JSON.stringify(jsonCommand));
         };
+        TWebChannel.prototype.sendMessage = function (content, callback) {
+            this.dialog.jsToAdvpl("MESSAGE", content, callback);
+        };
         TWebChannel.prototype.jsToAdvpl = function (codeType, codeContent) {
             this.dialog.jsToAdvpl(codeType, codeContent);
         };
-        TWebChannel.version = "0.0.1";
+        TWebChannel.version = "0.0.6";
         TWebChannel.BLUETOOTH_FEATURE = 1;
         TWebChannel.NFC_FEATURE = 2;
         TWebChannel.WIFI_FEATURE = 3;
