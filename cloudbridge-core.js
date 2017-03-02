@@ -565,12 +565,13 @@ var TOTVS;
                 };
             }
         }
-        TWebChannel.getChannel = function () {
-        };
         TWebChannel.start = function (port) {
             if (TWebChannel.instance === null) {
                 var channel = new TWebChannel(port, function () {
                     TWebChannel.instance = channel;
+                    if (window) {
+                        window['cloudbridge'] = channel;
+                    }
                     TWebChannel.emit('cloudbridgeready');
                 });
             }
@@ -716,7 +717,7 @@ var TOTVS;
         return TWebChannel;
     }());
     TWebChannel.instance = null;
-    TWebChannel.version = "0.0.18";
+    TWebChannel.version = "0.1.0";
     TWebChannel.BLUETOOTH_FEATURE = 1;
     TWebChannel.NFC_FEATURE = 2;
     TWebChannel.WIFI_FEATURE = 3;
