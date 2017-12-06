@@ -714,17 +714,17 @@ var TOTVS;
             }
             return data;
         };
+        TWebChannel.instance = null;
+        TWebChannel.version = "0.1.4";
+        TWebChannel.BLUETOOTH_FEATURE = 1;
+        TWebChannel.NFC_FEATURE = 2;
+        TWebChannel.WIFI_FEATURE = 3;
+        TWebChannel.LOCATION_FEATURE = 4;
+        TWebChannel.CONNECTED_WIFI = 5;
+        TWebChannel.CONNECTED_MOBILE = 6;
+        TWebChannel.JSON_FLAG = "#JSON#";
         return TWebChannel;
     }());
-    TWebChannel.instance = null;
-    TWebChannel.version = "0.1.3";
-    TWebChannel.BLUETOOTH_FEATURE = 1;
-    TWebChannel.NFC_FEATURE = 2;
-    TWebChannel.WIFI_FEATURE = 3;
-    TWebChannel.LOCATION_FEATURE = 4;
-    TWebChannel.CONNECTED_WIFI = 5;
-    TWebChannel.CONNECTED_MOBILE = 6;
-    TWebChannel.JSON_FLAG = "#JSON#";
     TOTVS.TWebChannel = TWebChannel;
 })(TOTVS || (TOTVS = {}));
 //# sourceMappingURL=totvs-twebchannel.js.map
